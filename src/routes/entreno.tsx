@@ -309,10 +309,10 @@ function Serie({
       onPointerUp={pressEnd}
       onPointerLeave={pressEnd}
     >
-      <div className="flex items-center gap-2">
-        <span className="w-12 shrink-0 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-          Serie {serie}
-        </span>
+      <p className="px-1 pb-1 text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+        Serie {serie}
+      </p>
+      <div className="flex items-center gap-1">
         {esTiempo ? (
           <Stepper value={reps} onChange={setReps} step={5} suffix="seg" />
         ) : (
@@ -324,7 +324,7 @@ function Serie({
         <button
           onClick={guardar}
           aria-label={`Completar serie ${serie}`}
-          className="tap ml-auto flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground active:opacity-90"
+          className="ml-auto flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-primary text-primary-foreground active:opacity-90"
         >
           <Check className="h-7 w-7" strokeWidth={3} />
         </button>
