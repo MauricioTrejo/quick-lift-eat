@@ -174,8 +174,8 @@ export function promedioCategoria(categoria: Categoria) {
 export function siguienteEvento(hora: number) {
   const lista = seed.meal_presets.protocolo_tarde;
   const decimal = (h: string) => {
-    const [hh, mm] = h.split(":").map(Number);
-    return hh + mm / 60;
+    const partes = h.split(":").map(Number);
+    return (partes[0] ?? 0) + (partes[1] ?? 0) / 60;
   };
   return lista.find((e) => decimal(e.hora) >= hora) ?? lista[0];
 }
