@@ -72,9 +72,9 @@ export type SetLog = {
   carga: number;
   reps: number;
   unidad: Unidad;
-  al_fallo?: boolean;
-  rir?: number;
-  nota?: string;
+  al_fallo?: boolean | undefined;
+  rir?: number | undefined;
+  nota?: string | undefined;
 };
 
 export type DemoSession = {
@@ -84,8 +84,8 @@ export type DemoSession = {
   nombre: string;
   tipo: string;
   estado: string;
-  rpe?: string;
-  sensacion?: string;
+  rpe?: string | undefined;
+  sensacion?: string | undefined;
   sets: SetLog[];
 };
 

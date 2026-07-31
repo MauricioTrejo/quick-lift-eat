@@ -6,8 +6,8 @@ export const SESION_HOY_ID = "s5";
 const KEY = "fuerza-demo-v1";
 
 export type SesionCierre = {
-  rpe?: string;
-  sensacion?: string;
+  rpe?: string | undefined;
+  sensacion?: string | undefined;
   duracion_s: number;
   at: string;
 };

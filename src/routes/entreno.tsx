@@ -224,7 +224,7 @@ function Serie({
 }: {
   ejercicio: Prescription;
   serie: number;
-  log?: SetLog;
+  log?: SetLog | undefined;
   expandida: boolean;
   esTiempo: boolean;
   onExpandir: () => void;
