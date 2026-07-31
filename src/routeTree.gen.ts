@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ComidaRouteImport } from './routes/comida'
 import { Route as EntrenoRouteImport } from './routes/entreno'
+import { Route as ProgresoRouteImport } from './routes/progreso'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -28,35 +29,44 @@ const EntrenoRoute = EntrenoRouteImport.update({
   path: '/entreno',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProgresoRoute = ProgresoRouteImport.update({
+  id: '/progreso',
+  path: '/progreso',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/comida': typeof ComidaRoute
   '/entreno': typeof EntrenoRoute
+  '/progreso': typeof ProgresoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/comida': typeof ComidaRoute
   '/entreno': typeof EntrenoRoute
+  '/progreso': typeof ProgresoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/comida': typeof ComidaRoute
   '/entreno': typeof EntrenoRoute
+  '/progreso': typeof ProgresoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/comida' | '/entreno'
+  fullPaths: '/' | '/comida' | '/entreno' | '/progreso'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/comida' | '/entreno'
-  id: '__root__' | '/' | '/comida' | '/entreno'
+  to: '/' | '/comida' | '/entreno' | '/progreso'
+  id: '__root__' | '/' | '/comida' | '/entreno' | '/progreso'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ComidaRoute: typeof ComidaRoute
   EntrenoRoute: typeof EntrenoRoute
+  ProgresoRoute: typeof ProgresoRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -82,6 +92,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EntrenoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/progreso': {
+      id: '/progreso'
+      path: '/progreso'
+      fullPath: '/progreso'
+      preLoaderRoute: typeof ProgresoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ComidaRoute: ComidaRoute,
   EntrenoRoute: EntrenoRoute,
+  ProgresoRoute: ProgresoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
