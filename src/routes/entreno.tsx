@@ -42,6 +42,12 @@ const chip: Record<string, string> = {
   terracota: "bg-terracota-soft text-terracota",
 };
 
+const punto: Record<string, string> = {
+  verde: "bg-verde",
+  ambar: "bg-ambar",
+  terracota: "bg-terracota",
+};
+
 const chipTexto: Record<string, string> = {
   verde: "progresa",
   ambar: "mantén",
@@ -57,8 +63,6 @@ function useCrono(activo: boolean) {
   }, [activo]);
   return s;
 }
-
-export default function noop() {}
 
 function Entreno() {
   const navigate = useNavigate();
@@ -113,7 +117,7 @@ function Entreno() {
                 className="tap flex w-full items-center justify-between rounded-xl bg-card px-4 text-left"
               >
                 <span className="flex items-center gap-2 truncate">
-                  <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", `bg-${e.semaforo}`)} />
+                  <span className={cn("h-2.5 w-2.5 shrink-0 rounded-full", punto[e.semaforo])} />
                   <span className="truncate text-sm font-medium">{e.ejercicio}</span>
                 </span>
                 {completo ? (
