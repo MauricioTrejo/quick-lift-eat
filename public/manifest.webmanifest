@@ -1,0 +1,15 @@
+{
+  "name": "Fuerza y Plato",
+  "short_name": "Fuerza",
+  "description": "Registro de entrenamiento de fuerza y comidas en pocos taps.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#101418",
+  "theme_color": "#101418",
+  "icons": [
+    { "src": "/images/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "/images/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
