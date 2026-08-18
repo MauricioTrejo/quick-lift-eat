@@ -1,0 +1,68 @@
+{
+  "_meta": {
+    "fuente": "sistema_alimentacion_flexible_v1.html — §03 plantilla del plato, §04 el banco, §05 protocolo de la tarde",
+    "extraido": "2026-07-31",
+    "ADVERTENCIA": "Los macros son ESTIMACIONES de tablas nutricionales estándar, no medidos. Sirven para el MVP y para dar señal de dirección ('te faltan ~48 g de proteína'), no como verdad de laboratorio. Antes de Fase 2 conviene ajustar los items que más repites contra la etiqueta real del producto que compras.",
+    "unidades_mano": {
+      "palma": "≈ 85-110 g de fuente proteica cocida",
+      "puño": "≈ 1 taza",
+      "pulgar": "≈ 1 cucharada"
+    }
+  },
+  "objetivos_diarios": {
+    "proteina_g": 140,
+    "fibra_g": 30,
+    "kcal_entrenamiento": 2100,
+    "kcal_descanso": 1850,
+    "nota": "El único ajuste que hace el día: día de entrenamiento o tenis, +1 puño de carbohidrato en la comida. Día de descanso, se quita."
+  },
+  "plantilla_plato": {
+    "desayuno": { "proteina": 2, "verdura_o_fruta": 1, "grasa": 1, "extra": "1 cda de chía en agua, aparte" },
+    "comida": { "proteina": 2, "verdura": 2, "carbohidrato": 1, "grasa": 1 },
+    "cena": { "proteina": 2, "verdura": 2, "grasa": 1, "extra": "dulce planeado ~150 kcal, sin negociación ni culpa" },
+    "snack_1630": { "objetivo_kcal": 200, "objetivo_proteina": 20, "objetivo_fibra": 5 }
+  },
+  "food_items": [
+    { "id": "huevo", "nombre": "Huevo", "categoria": "proteina", "unidad": "palma (2 pzas)", "proteina": 12, "fibra": 0, "kcal": 140, "favorito": true },
+    { "id": "requeson", "nombre": "Requesón", "categoria": "proteina", "unidad": "palma (½ taza)", "proteina": 12, "fibra": 0, "kcal": 100, "favorito": true },
+    { "id": "yogurt_griego", "nombre": "Yogurt griego natural", "categoria": "proteina", "unidad": "palma (170 g)", "proteina": 17, "fibra": 0, "kcal": 100, "favorito": true },
+    { "id": "atun", "nombre": "Atún en agua", "categoria": "proteina", "unidad": "palma (1 lata drenada)", "proteina": 25, "fibra": 0, "kcal": 110, "favorito": true },
+    { "id": "pollo", "nombre": "Pechuga de pollo", "categoria": "proteina", "unidad": "palma (100 g cocido)", "proteina": 31, "fibra": 0, "kcal": 165, "favorito": true },
+    { "id": "res_magra", "nombre": "Res magra", "categoria": "proteina", "unidad": "palma (100 g)", "proteina": 26, "fibra": 0, "kcal": 180 },
+    { "id": "cerdo_lomo", "nombre": "Lomo de cerdo", "categoria": "proteina", "unidad": "palma (100 g)", "proteina": 27, "fibra": 0, "kcal": 170 },
+    { "id": "pescado_blanco", "nombre": "Pescado blanco", "categoria": "proteina", "unidad": "palma (100 g)", "proteina": 22, "fibra": 0, "kcal": 100 },
+    { "id": "camaron", "nombre": "Camarón", "categoria": "proteina", "unidad": "palma (100 g)", "proteina": 24, "fibra": 0, "kcal": 99 },
+    { "id": "proteina_polvo", "nombre": "Proteína en polvo", "categoria": "proteina", "unidad": "scoop (30 g)", "proteina": 24, "fibra": 1, "kcal": 120, "favorito": true },
+
+    { "id": "nopal", "nombre": "Nopal", "categoria": "verdura", "unidad": "puño (1 taza)", "proteina": 1.5, "fibra": 3, "kcal": 20, "favorito": true },
+    { "id": "calabacita", "nombre": "Calabacita", "categoria": "verdura", "unidad": "puño (1 taza)", "proteina": 1.5, "fibra": 1.5, "kcal": 20, "favorito": true },
+    { "id": "ejote", "nombre": "Ejote", "categoria": "verdura", "unidad": "puño (1 taza)", "proteina": 2, "fibra": 3, "kcal": 35, "favorito": true },
+    { "id": "ensalada_mixta", "nombre": "Ensalada mixta", "categoria": "verdura", "unidad": "puño (1 taza)", "proteina": 1, "fibra": 1.5, "kcal": 15, "favorito": true },
+    { "id": "espinaca", "nombre": "Espinaca cocida", "categoria": "verdura", "unidad": "puño (1 taza)", "proteina": 3, "fibra": 2.5, "kcal": 25 },
+    { "id": "brocoli", "nombre": "Brócoli", "categoria": "verdura", "unidad": "puño (1 taza)", "proteina": 2.5, "fibra": 2.5, "kcal": 30 },
+    { "id": "chile_relleno_verdura", "nombre": "Chile relleno de verdura", "categoria": "verdura", "unidad": "pieza", "proteina": 3, "fibra": 3, "kcal": 90 },
+    { "id": "zanahoria", "nombre": "Zanahoria", "categoria": "verdura", "unidad": "puño (1 taza)", "proteina": 1, "fibra": 3.5, "kcal": 50, "favorito": true, "tag": "taper_escritorio" },
+    { "id": "jicama", "nombre": "Jícama", "categoria": "verdura", "unidad": "puño (1 taza)", "proteina": 1, "fibra": 6, "kcal": 45, "favorito": true, "tag": "taper_escritorio" },
+    { "id": "pepino", "nombre": "Pepino", "categoria": "verdura", "unidad": "puño (1 taza)", "proteina": 0.7, "fibra": 1, "kcal": 16, "favorito": true, "tag": "taper_escritorio" },
+
+    { "id": "frutos_rojos", "nombre": "Frutos rojos / frambuesas", "categoria": "fruta", "unidad": "puño (1 taza)", "proteina": 1.5, "fibra": 8, "kcal": 65, "favorito": true, "tag": "cierra_fibra" },
+    { "id": "fresas", "nombre": "Fresas", "categoria": "fruta", "unidad": "puño (1 taza)", "proteina": 1, "fibra": 3, "kcal": 50 },
+    { "id": "manzana", "nombre": "Manzana", "categoria": "fruta", "unidad": "pieza mediana", "proteina": 0.5, "fibra": 4.5, "kcal": 95, "favorito": true },
+
+    { "id": "arroz", "nombre": "Arroz cocido", "categoria": "carbohidrato", "unidad": "puño (1 taza)", "proteina": 4, "fibra": 0.6, "kcal": 205, "favorito": true },
+    { "id": "tortilla_maiz", "nombre": "Tortilla de maíz", "categoria": "carbohidrato", "unidad": "puño (2 pzas)", "proteina": 3, "fibra": 3, "kcal": 120, "favorito": true },
+    { "id": "frijol", "nombre": "Frijol cocido", "categoria": "carbohidrato", "unidad": "puño (1 taza)", "proteina": 15, "fibra": 15, "kcal": 225, "favorito": true, "tag": "cierra_fibra" },
+    { "id": "papa", "nombre": "Papa cocida", "categoria": "carbohidrato", "unidad": "puño (1 taza)", "proteina": 3, "fibra": 3, "kcal": 135 },
+    { "id": "camote", "nombre": "Camote", "categoria": "carbohidrato", "unidad": "puño (1 taza)", "proteina": 2, "fibra": 4, "kcal": 180 },
+    { "id": "avena", "nombre": "Avena", "categoria": "carbohidrato", "unidad": "puño (½ taza seca)", "proteina": 5, "fibra": 4, "kcal": 150 },
+
+    { "id": "aguacate", "nombre": "Aguacate", "categoria": "grasa", "unidad": "pulgar (⅓ pieza)", "proteina": 1, "fibra": 3, "kcal": 80, "favorito": true },
+    { "id": "aceite_oliva", "nombre": "Aceite de oliva", "categoria": "grasa", "unidad": "pulgar (1 cda)", "proteina": 0, "fibra": 0, "kcal": 120, "favorito": true },
+    { "id": "pepitas", "nombre": "Pepitas", "categoria": "grasa", "unidad": "pulgar (30 g)", "proteina": 9, "fibra": 2, "kcal": 160, "favorito": true },
+    { "id": "almendras", "nombre": "Almendras", "categoria": "grasa", "unidad": "pulgar (30 g)", "proteina": 6, "fibra": 3.5, "kcal": 165 },
+    { "id": "crema_cacahuate", "nombre": "Crema de cacahuate", "categoria": "grasa", "unidad": "pulgar (1 cda)", "proteina": 4, "fibra": 1, "kcal": 95 },
+
+    { "id": "chia", "nombre": "Chía", "categoria": "extra", "unidad": "cda (12 g)", "proteina": 2, "fibra": 5, "kcal": 60, "favorito": true, "no_negociable": true, "tag": "cierra_fibra" },
+    { "id": "dulce_planeado", "nombre": "Dulce planeado", "categoria": "extra", "unidad": "porción (~150 kcal)", "proteina": 2, "fibra": 1, "kcal": 150, "favorito": true, "nota": "sin negociación ni culpa — la indulgencia programada evita el atracón reactivo" }
+  ]
+}

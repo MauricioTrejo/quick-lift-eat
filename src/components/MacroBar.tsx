@@ -26,7 +26,9 @@ export function MacroBar({ etiqueta, consumido, objetivo, unidad, tono, nota }: 
         <div>
           <p className="text-xs uppercase tracking-widest text-muted-foreground">{etiqueta}</p>
           <p className="flex items-baseline gap-1">
-            <span className={cn("num text-3xl font-semibold", listo ? "text-verde" : "text-foreground")}>
+            <span
+              className={cn("num text-3xl font-semibold", listo ? "text-verde" : "text-foreground")}
+            >
               {listo ? "listo" : faltante}
             </span>
             {!listo && <span className="num text-sm text-muted-foreground">{unidad} faltan</span>}

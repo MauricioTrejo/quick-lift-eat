@@ -1,0 +1,167 @@
+{
+  "nombre": "Ejemplo · 3 días",
+  "objetivos": {
+    "proteinaG": 120,
+    "fibraG": 30,
+    "kcalEntreno": 2200,
+    "kcalDescanso": 1900
+  },
+  "agenda": [
+    {
+      "hora": "10:00",
+      "evento": "500 ml de agua",
+      "tipo": "ancla"
+    },
+    {
+      "hora": "16:30",
+      "evento": "Snack con proteína",
+      "tipo": "comida"
+    }
+  ],
+  "sesiones": [
+    {
+      "diaSemana": 1,
+      "nombre": "Empuje + core",
+      "tipo": "push",
+      "duracionMin": 40,
+      "ejercicios": [
+        {
+          "exerciseId": "press_militar",
+          "series": 3,
+          "reps": 10,
+          "carga": 20,
+          "unidad": "lb",
+          "porLado": false,
+          "semaforo": "verde",
+          "nota": "Si salen 3x10 limpias, sube 5 lb la próxima vez."
+        },
+        {
+          "exerciseId": "push_up_deficit",
+          "series": 3,
+          "reps": 10,
+          "carga": 0,
+          "unidad": "reps",
+          "porLado": false,
+          "semaforo": "verde",
+          "nota": "Baja hasta que el pecho pase la línea de las manos."
+        },
+        {
+          "exerciseId": "lateral_raise",
+          "series": 3,
+          "reps": 12,
+          "carga": 10,
+          "unidad": "lb",
+          "porLado": false,
+          "semaforo": "ambar",
+          "nota": "Peso ligero. Si tienes que balancearte, va demasiado pesado."
+        },
+        {
+          "exerciseId": "plancha",
+          "series": 3,
+          "reps": 45,
+          "carga": 0,
+          "unidad": "segundos",
+          "porLado": false,
+          "semaforo": "verde",
+          "nota": "Cadera alineada. Corta la serie antes de que se hunda."
+        }
+      ]
+    },
+    {
+      "diaSemana": 3,
+      "nombre": "Jalón + pierna",
+      "tipo": "pull",
+      "duracionMin": 45,
+      "ejercicios": [
+        {
+          "exerciseId": "remo_1_mano",
+          "series": 3,
+          "reps": 10,
+          "carga": 25,
+          "unidad": "lb",
+          "porLado": true,
+          "semaforo": "verde",
+          "nota": "Tira con el codo, no con la mano."
+        },
+        {
+          "exerciseId": "sentadilla_copa",
+          "series": 3,
+          "reps": 12,
+          "carga": 30,
+          "unidad": "lb",
+          "porLado": false,
+          "semaforo": "verde",
+          "nota": "Talones en el suelo, pecho arriba."
+        },
+        {
+          "exerciseId": "peso_muerto_rumano",
+          "series": 3,
+          "reps": 10,
+          "carga": 30,
+          "unidad": "lb",
+          "porLado": false,
+          "semaforo": "verde",
+          "nota": "Bisagra de cadera, rodillas casi rectas. Debe estirar el femoral."
+        },
+        {
+          "exerciseId": "bird_dog",
+          "series": 3,
+          "reps": 10,
+          "carga": 0,
+          "unidad": "reps",
+          "porLado": false,
+          "semaforo": "verde",
+          "nota": "Lento. La cadera no debe rotar."
+        }
+      ]
+    },
+    {
+      "diaSemana": 5,
+      "nombre": "Pierna unilateral + cardio",
+      "tipo": "pierna",
+      "duracionMin": 50,
+      "ejercicios": [
+        {
+          "exerciseId": "sentadilla_bulgara",
+          "series": 3,
+          "reps": 8,
+          "carga": 20,
+          "unidad": "lb",
+          "porLado": true,
+          "semaforo": "ambar",
+          "nota": "Empieza sin peso hasta que el equilibrio sea sólido."
+        },
+        {
+          "exerciseId": "calf_raise_asistida",
+          "series": 3,
+          "reps": 15,
+          "carga": 0,
+          "unidad": "reps",
+          "porLado": false,
+          "semaforo": "verde",
+          "nota": "Pausa arriba de un segundo en cada repetición."
+        },
+        {
+          "exerciseId": "hollow_hold",
+          "series": 3,
+          "reps": 30,
+          "carga": 0,
+          "unidad": "segundos",
+          "porLado": false,
+          "semaforo": "verde",
+          "nota": "Lumbar pegada al suelo. Si se despega, dobla las rodillas."
+        },
+        {
+          "exerciseId": "remo_z2",
+          "series": 1,
+          "reps": 1200,
+          "carga": 0,
+          "unidad": "segundos",
+          "porLado": false,
+          "semaforo": "verde",
+          "nota": "Ritmo conversacional: deberías poder hablar sin cortarte."
+        }
+      ]
+    }
+  ]
+}

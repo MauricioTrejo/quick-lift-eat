@@ -1,0 +1,21 @@
+# Copia este archivo a `.dev.vars` para correr en local.
+#
+#   cp .dev.vars.example .dev.vars
+#
+# `.dev.vars` está en .gitignore y wrangler NUNCA lo despliega: solo lo lee
+# `wrangler dev`. Por eso es el lugar correcto para AUTH_MODO=abierto, que en
+# producción sería un agujero.
+
+# Sin esto, la app se niega a arrancar si no hay Cloudflare Access enfrente.
+# Es a propósito: el modo por defecto es cerrado, y abrirlo tiene que ser un acto
+# explícito y local, no algo que pase por olvido al desplegar.
+AUTH_MODO=abierto
+DEV_USER_EMAIL=dev@localhost
+
+# Necesaria SOLO para los agentes (generar un plan, ajustarlo tras entrenar).
+# Sin ella el resto de la app funciona igual: puedes importar un plan en JSON,
+# registrar entrenos y registrar comidas.
+#
+# La lee tanto `npm run dev` (vía scripts/dev.mjs) como `npm run preview:worker`.
+# En producción NO va en un archivo: `wrangler secret put ANTHROPIC_API_KEY`.
+# ANTHROPIC_API_KEY=sk-ant-...

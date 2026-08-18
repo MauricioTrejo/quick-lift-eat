@@ -1,0 +1,20 @@
+{
+  "version": "7",
+  "dialect": "sqlite",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1786393844324,
+      "tag": "0000_esquema_inicial",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "6",
+      "when": 1786398010922,
+      "tag": "0001_plantilla_plato",
+      "breakpoints": true
+    }
+  ]
+}

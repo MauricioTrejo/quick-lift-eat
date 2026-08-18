@@ -1,0 +1,40 @@
+{
+  // ---------------------------------------------------------------------------
+  // Bindings de Cloudflare. Este archivo es la ÚNICA parte de la configuración de
+  // despliegue que controlamos a mano, y sirve para dos cosas:
+  //
+  //   1. Los comandos `npm run db:*` lo leen (wrangler lo autodescubre en la raíz).
+  //   2. nitro también lo autodescubre y fusiona estas claves sobre el
+  //      .output/server/wrangler.json que regenera en cada build. Verificado:
+  //      tras `npm run build`, el generado sale con d1_databases y con el `name`
+  //      de aquí en vez del autogenerado. No hace falta ningún paso de postbuild.
+  //
+  // nitro sigue mandando en los detalles del build (main, assets, no_bundle,
+  // rules); nosotros solo en los bindings y el nombre del worker.
+  //
+  // SI CLONASTE ESTE REPO: corre `npm run db:create` y pega abajo el database_id
+  // que te devuelva. Ese id NO es un secreto — es un identificador, no una
+  // credencial — y por eso este archivo sí se versiona. Las llaves de verdad
+  // (ANTHROPIC_API_KEY) van con `wrangler secret put`, nunca aquí.
+  // ---------------------------------------------------------------------------
+
+  "name": "quick-lift-eat",
+  "compatibility_date": "2026-08-07",
+  "compatibility_flags": ["nodejs_compat"],
+
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "quick-lift-eat",
+      // Reemplázalo con el id que devuelve `npm run db:create`.
+      // En local no se usa: wrangler crea la base bajo .wrangler/state/ y la
+      // identifica por database_name.
+      "database_id": "PENDIENTE-CORRE-npm-run-db:create",
+
+      // Carpeta que genera drizzle-kit y que aplica `npm run db:migrate` (local)
+      // o `npm run db:migrate:remote` (Cloudflare). Va DENTRO de la entrada de la
+      // base: como clave de nivel superior, wrangler la ignora con un warning.
+      "migrations_dir": "drizzle"
+    }
+  ]
+}

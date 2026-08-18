@@ -1,15 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { seed, type Categoria, type Slot } from "@/data/types";
-import {
-  actions,
-  objetivos,
-  promedioCategoria,
-  slotPorHora,
-  totalesDelDia,
-  useHoraDecimal,
-  useStore,
-} from "@/lib/store";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Sparkles } from "lucide-react";
+import { obtenerComida } from "@/lib/api/queries";
+import { registrarComida } from "@/lib/api/mutations";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/comida")({
@@ -31,6 +25,9 @@ export const Route = createFileRoute("/comida")({
   component: Comida,
 });
 
+type Slot = "desayuno" | "comida" | "snack" | "cena";
+type Categoria = "proteina" | "verdura" | "carbohidrato" | "grasa";
+
 const slots: Slot[] = ["desayuno", "comida", "snack", "cena"];
 
 const cats: { key: Categoria; etiqueta: string; medida: string; icono: string }[] = [
@@ -40,14 +37,25 @@ const cats: { key: Categoria; etiqueta: string; medida: string; icono: string }[
   { key: "grasa", etiqueta: "Grasa", medida: "pulgares", icono: "👍" },
 ];
 
+/** El slot se infiere de la hora; el selector solo existe para corregirlo. */
+function slotPorHora(h: number): Slot {
+  if (h < 11) return "desayuno";
+  if (h < 16) return "comida";
+  if (h < 18.5) return "snack";
+  return "cena";
+}
+
 function Comida() {
   const navigate = useNavigate();
-  const hora = useHoraDecimal();
-  const mealLogs = useStore((s) => s.mealLogs);
-  const [slot, setSlot] = useState<Slot | null>(null);
-  const slotActual = slot ?? slotPorHora(hora);
+  const qc = useQueryClient();
+  const [slotElegido, setSlotElegido] = useState<Slot | null>(null);
+  const slot = slotElegido ?? slotPorHora(new Date().getHours() + new Date().getMinutes() / 60);
 
-  const plantilla = seed.food_bank.plantilla_plato[slotActual];
+  const { data, isPending } = useQuery({
+    queryKey: ["comida", slot],
+    queryFn: () => obtenerComida({ data: { slot } }),
+  });
+
   const [porciones, setPorciones] = useState<Record<Categoria, number> | null>(null);
   const [abierta, setAbierta] = useState<Categoria | null>(null);
   const [elegidos, setElegidos] = useState<Partial<Record<Categoria, string>>>({});
@@ -55,62 +63,79 @@ function Comida() {
   const [mostrarTexto, setMostrarTexto] = useState(false);
   const [feedback, setFeedback] = useState<string | null>(null);
 
-  const cantidades = porciones ?? plantilla;
-  const presets = seed.meal_presets.presets.filter((p) => p.slot === slotActual);
+  const mRegistrar = useMutation({
+    mutationFn: (v: Parameters<typeof registrarComida>[0]) => registrarComida(v),
+    onSuccess: async () => {
+      await qc.invalidateQueries();
+      setTimeout(() => navigate({ to: "/" }), 1600);
+    },
+  });
 
-  function setCantidad(cat: Categoria, v: number) {
-    setPorciones({ ...cantidades, [cat]: Math.max(0, v) });
-  }
+  if (isPending || !data) return <Cargando />;
 
-  function registrar(nombre: string, macros: { proteina_g: number; fibra_g: number; calorias: number }, sinAnalizar = false) {
-    actions.addMeal({
-      slot: slotActual,
-      nombre,
-      hora: `${String(Math.floor(hora)).padStart(2, "0")}:${String(
-        Math.round((hora % 1) * 60),
-      ).padStart(2, "0")}`,
-      sin_analizar: sinAnalizar,
-      ...macros,
-    });
-    const total = totalesDelDia([
-      ...mealLogs,
-      {
-        id: "tmp",
-        fecha: "2026-07-31",
-        slot: slotActual,
-        nombre,
-        hora: "",
-        sin_analizar: sinAnalizar,
-        ...macros,
-      },
-    ]);
-    const faltaP = Math.max(0, objetivos.proteina_g - total.proteina_g);
-    const faltaF = Math.max(0, objetivos.fibra_g - total.fibra_g);
+  const plantillaSlot = (data.plantilla?.[slot] ?? {}) as Partial<Record<Categoria, number>>;
+  const cantidades: Record<Categoria, number> =
+    porciones ??
+    ({
+      proteina: plantillaSlot.proteina ?? 0,
+      verdura: plantillaSlot.verdura ?? 0,
+      carbohidrato: plantillaSlot.carbohidrato ?? 0,
+      grasa: plantillaSlot.grasa ?? 0,
+    } as Record<Categoria, number>);
+
+  /**
+   * El texto de cierre. Antes decía "Te faltan 44 g y 6 g de fibra", que se lee
+   * como si los 44 también fueran fibra. Y la sugerencia salía al azar: ahora se
+   * elige por contexto — si vas peor de fibra que de proteína en proporción a tu
+   * objetivo, te habla de fibra.
+   */
+  function construirFeedback(p: number, f: number) {
+    const faltaP = Math.max(0, data!.objetivos.proteinaG - p);
+    const faltaF = Math.max(0, data!.objetivos.fibraG - f);
+    const huecoP = faltaP / data!.objetivos.proteinaG;
+    const huecoF = faltaF / data!.objetivos.fibraG;
+
+    const partes: string[] = [];
+    if (faltaP > 0) partes.push(`${Math.round(faltaP)} g de proteína`);
+    if (faltaF > 0) partes.push(`${Math.round(faltaF)} g de fibra`);
+
+    const base = `Vas en ${Math.round(p)} g de proteína.`;
+    if (!partes.length) return `${base} Ya cerraste tus dos objetivos del día.`;
+
     const sugerencia =
-      seed.demo.recomendaciones_demo[
-        Math.floor(Math.random() * seed.demo.recomendaciones_demo.length)
-      ];
-    setFeedback(
-      `Vas en ${total.proteina_g} g de proteína. Te faltan ${faltaP} g y ${faltaF} g de fibra. ${sugerencia}`,
-    );
-    setTimeout(() => navigate({ to: "/" }), 1600);
+      huecoF > huecoP
+        ? "Un puño de frijol son 15 g de fibra de un golpe."
+        : "Una palma más de proteína en la cena cierra el hueco.";
+    return `${base} Te faltan ${partes.join(" y ")}. ${sugerencia}`;
   }
 
-  function registrarPlato() {
-    const macros = cats.reduce(
-      (acc, c) => {
-        const n = cantidades[c.key];
-        const elegido = seed.food_bank.food_items.find((f) => f.id === elegidos[c.key]);
-        const base = elegido ?? promedioCategoria(c.key);
-        return {
-          proteina_g: acc.proteina_g + base.proteina_g * n,
-          fibra_g: acc.fibra_g + base.fibra_g * n,
-          calorias: acc.calorias + base.calorias * n,
-        };
+  function registrar(
+    nombre: string,
+    items: { foodItemId: string | null; categoria: Categoria; cantidad: number }[],
+    origen: "preset" | "plato" | "texto",
+    extra?: { textoOriginal?: string; sinAnalizar?: boolean },
+  ) {
+    mRegistrar.mutate(
+      {
+        data: {
+          slot,
+          nombre,
+          origen,
+          items,
+          sinAnalizar: extra?.sinAnalizar ?? false,
+          ...(extra?.textoOriginal && { textoOriginal: extra.textoOriginal }),
+        },
       },
-      { proteina_g: 0, fibra_g: 0, calorias: 0 },
+      {
+        onSuccess: (r) => {
+          const t = data!.delDia.reduce(
+            (acc, m) => ({ p: acc.p + m.proteinaG, f: acc.f + m.fibraG }),
+            { p: 0, f: 0 },
+          );
+          setFeedback(construirFeedback(t.p + r.total.proteinaG, t.f + r.total.fibraG));
+        },
+      },
     );
-    registrar(`Plato de ${slotActual}`, macros);
   }
 
   if (feedback) {
@@ -123,22 +148,25 @@ function Comida() {
     );
   }
 
+  const puedeDerivar = data.historial >= data.minimoParaDerivar;
+
   return (
     <div className="mx-auto max-w-md px-4 pb-28 pt-6">
       <h1 className="text-2xl font-semibold tracking-tight">Comida</h1>
 
-      {/* Slot */}
       <div className="mt-3 flex gap-1.5">
         {slots.map((s) => (
           <button
             key={s}
             onClick={() => {
-              setSlot(s);
+              setSlotElegido(s);
               setPorciones(null);
             }}
             className={cn(
               "min-h-[44px] flex-1 rounded-xl text-xs font-medium capitalize",
-              s === slotActual ? "bg-primary text-primary-foreground" : "bg-elevated text-muted-foreground",
+              s === slot
+                ? "bg-primary text-primary-foreground"
+                : "bg-elevated text-muted-foreground",
             )}
           >
             {s}
@@ -146,34 +174,73 @@ function Comida() {
         ))}
       </div>
 
-      {/* Lo de siempre */}
+      {/* LO DE SIEMPRE — derivado de lo que realmente comes, en cuanto haya
+          historial suficiente. Antes de eso, presets semilla; fingir un ranking
+          con dos registros sería inventarse una preferencia. */}
       <section className="mt-5">
-        <p className="text-xs uppercase tracking-widest text-muted-foreground">Lo de siempre</p>
-        <div className="-mx-4 mt-2 flex gap-3 overflow-x-auto px-4 pb-2">
-          {presets.map((p) => (
-            <button
-              key={p.id}
-              onClick={() =>
-                registrar(p.nombre, {
-                  proteina_g: p.proteina_g,
-                  fibra_g: p.fibra_g,
-                  calorias: p.calorias,
-                })
-              }
-              className="min-h-[104px] w-40 shrink-0 rounded-2xl bg-verde-soft p-3 text-left active:opacity-90"
-            >
-              <p className="text-sm font-semibold leading-tight text-foreground">{p.nombre}</p>
-              <p className="num mt-2 text-xs text-verde">
-                {p.proteina_g} g P · {p.fibra_g} g F
-              </p>
-              <p className="num mt-0.5 text-[11px] text-muted-foreground">{p.calorias} kcal</p>
-            </button>
-          ))}
+        <div className="flex items-baseline justify-between">
+          <p className="text-xs uppercase tracking-widest text-muted-foreground">Lo de siempre</p>
+          {puedeDerivar && (
+            <span className="flex items-center gap-1 text-[10px] text-verde">
+              <Sparkles className="h-3 w-3" />
+              tuyo
+            </span>
+          )}
         </div>
-        <p className="text-[11px] text-muted-foreground">Un tap registra y cierra.</p>
+
+        <div className="-mx-4 mt-2 flex gap-3 overflow-x-auto px-4 pb-2">
+          {puedeDerivar
+            ? data.frecuentes.map((f) => (
+                <button
+                  key={f.food_item_id}
+                  onClick={() =>
+                    registrar(
+                      f.nombre,
+                      [
+                        {
+                          foodItemId: f.food_item_id,
+                          categoria: f.categoria as Categoria,
+                          cantidad: Math.max(1, Math.round(f.cantidad_promedio)),
+                        },
+                      ],
+                      "preset",
+                    )
+                  }
+                  className="min-h-[104px] w-40 shrink-0 rounded-2xl bg-verde-soft p-3 text-left active:opacity-90"
+                >
+                  <p className="text-sm font-semibold leading-tight text-foreground">{f.nombre}</p>
+                  <p className="num mt-2 text-xs text-verde">
+                    {Math.round(f.proteina_unidad)} g P · {Math.round(f.fibra_unidad)} g F
+                  </p>
+                  <p className="num mt-0.5 text-[11px] text-muted-foreground">
+                    {f.veces} {f.veces === 1 ? "vez" : "veces"} · {f.medida}
+                  </p>
+                </button>
+              ))
+            : data.presets.map((p) => (
+                <button
+                  key={p.id}
+                  onClick={() => registrar(p.nombre, [], "preset")}
+                  className="min-h-[104px] w-40 shrink-0 rounded-2xl bg-verde-soft p-3 text-left active:opacity-90"
+                >
+                  <p className="text-sm font-semibold leading-tight text-foreground">{p.nombre}</p>
+                  <p className="num mt-2 text-xs text-verde">
+                    {Math.round(p.proteinaG)} g P · {Math.round(p.fibraG)} g F
+                  </p>
+                  <p className="num mt-0.5 text-[11px] text-muted-foreground">
+                    {Math.round(p.calorias)} kcal
+                  </p>
+                </button>
+              ))}
+        </div>
+        <p className="text-[11px] text-muted-foreground">
+          {puedeDerivar
+            ? "Ordenado por lo que más comes en este horario."
+            : `Sugerencias de arranque. Tras ${data.minimoParaDerivar} comidas registradas, aquí sale lo tuyo.`}
+        </p>
       </section>
 
-      {/* Plato con la mano */}
+      {/* Armar el plato con la mano */}
       <section className="mt-5 rounded-2xl bg-card p-4">
         <p className="text-xs uppercase tracking-widest text-muted-foreground">
           Armar el plato con la mano
@@ -181,7 +248,7 @@ function Comida() {
         <div className="mt-3 space-y-2">
           {cats.map((c) => {
             const n = cantidades[c.key];
-            const elegido = seed.food_bank.food_items.find((f) => f.id === elegidos[c.key]);
+            const elegido = data.alimentos.find((f) => f.id === elegidos[c.key]);
             return (
               <div key={c.key} className="rounded-xl bg-elevated/60 p-2">
                 <div className="flex items-center gap-2">
@@ -197,7 +264,7 @@ function Comida() {
                     </p>
                   </button>
                   <button
-                    onClick={() => setCantidad(c.key, n - 1)}
+                    onClick={() => setPorciones({ ...cantidades, [c.key]: Math.max(0, n - 1) })}
                     aria-label={`Menos ${c.medida}`}
                     className="tap flex h-14 w-12 items-center justify-center rounded-l-xl bg-card text-2xl text-muted-foreground"
                   >
@@ -205,7 +272,7 @@ function Comida() {
                   </button>
                   <span className="num w-10 text-center text-3xl font-semibold">{n}</span>
                   <button
-                    onClick={() => setCantidad(c.key, n + 1)}
+                    onClick={() => setPorciones({ ...cantidades, [c.key]: n + 1 })}
                     aria-label={`Más ${c.medida}`}
                     className="tap flex h-14 w-12 items-center justify-center rounded-r-xl bg-card text-2xl text-muted-foreground"
                   >
@@ -214,7 +281,7 @@ function Comida() {
                 </div>
                 {abierta === c.key && (
                   <div className="mt-2 flex flex-wrap gap-1.5">
-                    {seed.food_bank.food_items
+                    {data.alimentos
                       .filter((f) => f.categoria === c.key)
                       .map((f) => (
                         <button
@@ -225,7 +292,9 @@ function Comida() {
                           }}
                           className={cn(
                             "min-h-[44px] rounded-lg px-3 text-xs",
-                            elegidos[c.key] === f.id ? "bg-primary text-primary-foreground" : "bg-card",
+                            elegidos[c.key] === f.id
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-card",
                           )}
                         >
                           {f.nombre}
@@ -241,14 +310,61 @@ function Comida() {
           })}
         </div>
         <button
-          onClick={registrarPlato}
-          className="tap mt-3 w-full rounded-xl bg-primary text-base font-semibold text-primary-foreground"
+          onClick={() =>
+            registrar(
+              `Plato de ${slot}`,
+              cats
+                .filter((c) => cantidades[c.key] > 0)
+                .map((c) => ({
+                  foodItemId: elegidos[c.key] ?? null,
+                  categoria: c.key,
+                  cantidad: cantidades[c.key],
+                })),
+              "plato",
+            )
+          }
+          disabled={mRegistrar.isPending}
+          className="tap mt-3 w-full rounded-xl bg-primary text-base font-semibold text-primary-foreground disabled:opacity-60"
         >
-          Registrar plato
+          {mRegistrar.isPending ? "Guardando…" : "Registrar plato"}
         </button>
       </section>
 
-      {/* Fallback de texto */}
+      {/* HOY — antes no existía. Sin esta lista, la etiqueta "sin analizar" se
+          guardaba en la base y no se veía en ninguna parte. */}
+      {data.delDia.length > 0 && (
+        <section className="mt-5">
+          <p className="text-xs uppercase tracking-widest text-muted-foreground">Hoy</p>
+          <div className="mt-2 space-y-1.5">
+            {data.delDia.map((m) => (
+              <div
+                key={m.id}
+                className="flex items-center justify-between rounded-xl bg-card px-3 py-2"
+              >
+                <div className="min-w-0">
+                  <p className="truncate text-sm font-medium">
+                    {m.nombre}
+                    {m.sinAnalizar && (
+                      <span className="ml-2 rounded-full bg-ambar-soft px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-ambar">
+                        sin analizar
+                      </span>
+                    )}
+                  </p>
+                  <p className="num text-[11px] text-muted-foreground">
+                    {m.hora} · {m.slot}
+                  </p>
+                </div>
+                <span className="num shrink-0 text-xs text-muted-foreground">
+                  {Math.round(m.proteinaG)} g P · {Math.round(m.fibraG)} g F
+                </span>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Fallback de texto: el único sitio con teclado, y está colapsado a
+          propósito para que no compita con el camino de taps. */}
       <section className="mt-4">
         <button
           onClick={() => setMostrarTexto((v) => !v)}
@@ -267,7 +383,10 @@ function Comida() {
             />
             <button
               onClick={() =>
-                registrar(texto || "Comida sin describir", { proteina_g: 0, fibra_g: 0, calorias: 0 }, true)
+                registrar(texto || "Comida sin describir", [], "texto", {
+                  textoOriginal: texto,
+                  sinAnalizar: true,
+                })
               }
               className="tap mt-2 w-full rounded-xl bg-elevated text-sm font-medium"
             >
@@ -276,6 +395,16 @@ function Comida() {
           </div>
         )}
       </section>
+    </div>
+  );
+}
+
+function Cargando() {
+  return (
+    <div className="mx-auto max-w-md px-4 pt-6">
+      <div className="h-8 w-28 animate-pulse rounded bg-elevated" />
+      <div className="mt-5 h-28 animate-pulse rounded-2xl bg-card" />
+      <div className="mt-4 h-72 animate-pulse rounded-2xl bg-card" />
     </div>
   );
 }

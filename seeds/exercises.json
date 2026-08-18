@@ -1,0 +1,95 @@
+{
+  "_meta": {
+    "fuente": "plan_entrenamiento_4_semanas.html (v11)",
+    "extraido": "2026-07-31",
+    "nota": "patron sirve para que el evaluador detecte huecos semanales. 'bisagra' esta marcado como faltante en el ciclo actual segun el propio plan."
+  },
+  "patrones": [
+    { "id": "push_vertical", "nombre": "Empuje vertical" },
+    { "id": "push_horizontal", "nombre": "Empuje horizontal" },
+    { "id": "pull_vertical", "nombre": "Jalón vertical" },
+    { "id": "pull_horizontal", "nombre": "Remo / jalón horizontal" },
+    { "id": "rodilla", "nombre": "Dominante de rodilla" },
+    { "id": "bisagra", "nombre": "Dominante de cadera", "faltante_en_ciclo": true },
+    { "id": "core", "nombre": "Core" },
+    { "id": "pantorrilla", "nombre": "Pantorrilla / tobillo" },
+    { "id": "aislado", "nombre": "Aislado" },
+    { "id": "cardio", "nombre": "Cardio" },
+    { "id": "movilidad", "nombre": "Movilidad / rehab" }
+  ],
+  "exercises": [
+    { "id": "sentadilla_copa", "nombre": "Sentadilla copa", "patron": "rodilla", "categoria": "compuesto", "equipo": ["mancuerna", "mochila"], "rango_reps": "6-12", "intensidad": "RIR 1-2", "linea_progresion": "pierna_pistol" },
+    { "id": "sentadilla_bulgara", "nombre": "Sentadilla búlgara", "patron": "rodilla", "categoria": "compuesto", "unilateral": true, "equipo": ["mancuerna", "mochila"], "rango_reps": "8-12", "intensidad": "RIR 1-2", "linea_progresion": "pierna_pistol" },
+    { "id": "desplante_caminando", "nombre": "Desplantes alternados", "patron": "rodilla", "categoria": "compuesto", "unilateral": true, "equipo": ["mancuerna", "mochila"], "rango_reps": "10-12", "intensidad": "RIR 1-2" },
+    { "id": "sentadilla_silla", "nombre": "Sentadilla a silla", "patron": "rodilla", "categoria": "compuesto", "equipo": ["corporal"], "rango_reps": "12-15", "estado": "graduado" },
+    { "id": "step_up_alto", "nombre": "Step-up alto", "patron": "rodilla", "categoria": "compuesto", "unilateral": true, "equipo": ["corporal", "mancuerna"], "linea_progresion": "pierna_pistol", "estado": "futuro" },
+    { "id": "pistol_cajon", "nombre": "Pistol a cajón alto", "patron": "rodilla", "categoria": "calistenia", "unilateral": true, "equipo": ["corporal"], "linea_progresion": "pierna_pistol", "estado": "futuro" },
+
+    { "id": "hip_thrust_1p", "nombre": "Hip thrust a una pierna", "patron": "bisagra", "categoria": "compuesto", "unilateral": true, "equipo": ["corporal", "mochila"], "rango_reps": "8-12", "nota": "sustituye al hip thrust bilateral que topó a 25 lb; a una pierna no tiene techo y corrige asimetrías" },
+    { "id": "glute_bridge", "nombre": "Glute bridge", "patron": "bisagra", "categoria": "accesorio", "equipo": ["corporal"], "rango_reps": "12-15", "estado": "graduado" },
+    { "id": "glute_bridge_1p", "nombre": "Glute bridge a una pierna", "patron": "bisagra", "categoria": "accesorio", "unilateral": true, "equipo": ["corporal"], "rango_reps": "10", "estado": "graduado" },
+    { "id": "peso_muerto_rumano", "nombre": "Peso muerto rumano", "patron": "bisagra", "categoria": "compuesto", "equipo": ["mancuerna", "ajustables"], "estado": "pendiente", "nota": "el plan lo señala como el patrón que hoy falta; entra en Bloque 2" },
+
+    { "id": "calf_raise_1p_escalon", "nombre": "Calf raise a una pierna en escalón", "patron": "pantorrilla", "categoria": "accesorio", "unilateral": true, "equipo": ["corporal"], "rango_reps": "15", "tempo": "bajada 4s", "nota": "talón cae bajo el escalón; construye fuerza en el rango de dorsiflexión" },
+    { "id": "calf_raise_asistida", "nombre": "Calf raises asistidas", "patron": "pantorrilla", "categoria": "accesorio", "equipo": ["corporal"], "estado": "graduado" },
+
+    { "id": "press_militar", "nombre": "Press militar sentado", "patron": "push_vertical", "categoria": "compuesto", "equipo": ["mancuerna"], "rango_reps": "6-10", "intensidad": "RIR 1-2", "techo_equipo": 25, "linea_progresion": "push_vertical_hspu" },
+    { "id": "pike_push_up", "nombre": "Pike push-up", "patron": "push_vertical", "categoria": "calistenia", "equipo": ["corporal"], "rango_reps": "8-12", "es_principal": true, "linea_progresion": "push_vertical_hspu", "nota": "puente entre wall handstand y HSPU; sin techo de equipo" },
+    { "id": "wall_handstand", "nombre": "Wall handstand hold", "patron": "push_vertical", "categoria": "skill", "equipo": ["corporal"], "unidad": "segundos", "linea_progresion": "push_vertical_hspu" },
+    { "id": "wall_hspu_negativo", "nombre": "Wall HSPU cara al muro (negativo)", "patron": "push_vertical", "categoria": "skill", "equipo": ["corporal"], "linea_progresion": "push_vertical_hspu", "estado": "futuro" },
+
+    { "id": "push_up_deficit", "nombre": "Push-up con déficit", "patron": "push_horizontal", "categoria": "calistenia", "equipo": ["corporal"], "rango_reps": "10-12", "intensidad": "al fallo", "linea_progresion": "push_horizontal_planche", "nota": "más estiramiento de pecho que las aperturas a 25 lb" },
+    { "id": "push_up_declinado", "nombre": "Push-up declinado (pies elevados)", "patron": "push_horizontal", "categoria": "calistenia", "equipo": ["corporal"], "rango_reps": "8-12", "linea_progresion": "push_horizontal_planche" },
+    { "id": "pseudo_planche_lean", "nombre": "Pseudo planche lean", "patron": "push_horizontal", "categoria": "skill", "equipo": ["corporal"], "unidad": "segundos", "linea_progresion": "push_horizontal_planche" },
+    { "id": "floor_press_pausa", "nombre": "Floor press con pausa 2s", "patron": "push_horizontal", "categoria": "compuesto", "equipo": ["mancuerna"], "rango_reps": "8", "techo_equipo": 25, "nota": "la pausa elimina el rebote; resuelve que el rango corto del suelo hacía sentir ligeras las 25 lb", "estado": "graduado" },
+    { "id": "aperturas", "nombre": "Aperturas tumbado", "patron": "push_horizontal", "categoria": "aislado", "equipo": ["mancuerna"], "rango_reps": "12", "intensidad": "al fallo", "estado": "graduado" },
+    { "id": "archer_push_up", "nombre": "Archer push-up", "patron": "push_horizontal", "categoria": "calistenia", "equipo": ["corporal"], "linea_progresion": "push_horizontal_planche", "estado": "futuro" },
+
+    { "id": "remo_1_mano", "nombre": "Remo a una mano", "patron": "pull_horizontal", "categoria": "compuesto", "unilateral": true, "equipo": ["mancuerna", "mochila"], "rango_reps": "10", "intensidad": "RIR 1", "nota": "mochila lastrada rompe el techo de 25 lb" },
+    { "id": "pullover", "nombre": "Pullover tumbado", "patron": "pull_horizontal", "categoria": "compuesto", "equipo": ["mancuerna"], "rango_reps": "10-12", "nota": "dos mancuernas verticales, palmas enfrentadas, resuelve el problema de agarre" },
+    { "id": "remo_banda", "nombre": "Remo con banda sentado", "patron": "pull_horizontal", "categoria": "accesorio", "equipo": ["banda"], "estado": "graduado" },
+    { "id": "dead_hang", "nombre": "Dead hang", "patron": "pull_vertical", "categoria": "skill", "equipo": ["barra"], "unidad": "segundos", "linea_progresion": "pull_dominada" },
+    { "id": "pull_up_asistido", "nombre": "Pull-up asistido con banda", "patron": "pull_vertical", "categoria": "calistenia", "equipo": ["barra", "banda"], "rango_reps": "5-8", "linea_progresion": "pull_dominada", "prioridad": true },
+    { "id": "pull_up_negativo", "nombre": "Pull-up negativo", "patron": "pull_vertical", "categoria": "calistenia", "equipo": ["barra"], "rango_reps": "3", "tempo": "bajada 3-5s", "linea_progresion": "pull_dominada", "nota": "clave para la primera dominada" },
+    { "id": "scapular_pulls", "nombre": "Scapular pulls colgado", "patron": "pull_vertical", "categoria": "accesorio", "equipo": ["barra"], "rango_reps": "8-10", "linea_progresion": "pull_dominada" },
+
+    { "id": "lateral_raise", "nombre": "Lateral raise", "patron": "aislado", "grupo": "hombro", "categoria": "aislado", "equipo": ["mancuerna"], "rango_reps": "10-15", "intensidad": "al fallo", "pareja": "rear_delt_fly" },
+    { "id": "rear_delt_fly", "nombre": "Rear delt fly tumbado", "patron": "aislado", "grupo": "hombro_posterior", "categoria": "aislado", "equipo": ["mancuerna"], "rango_reps": "12-15", "intensidad": "al fallo", "pareja": "lateral_raise" },
+    { "id": "ytw", "nombre": "YTW boca abajo", "patron": "aislado", "grupo": "hombro_posterior", "categoria": "accesorio", "equipo": ["corporal", "botellas"], "rango_reps": "10 cada letra", "nota": "rotación externa para salud de hombro" },
+    { "id": "face_pull", "nombre": "Face pull con banda", "patron": "aislado", "grupo": "hombro_posterior", "categoria": "accesorio", "equipo": ["banda"], "estado": "graduado" },
+    { "id": "press_frances", "nombre": "Press francés sentado", "patron": "aislado", "grupo": "triceps", "categoria": "aislado", "equipo": ["mancuerna"], "rango_reps": "12-15", "intensidad": "al fallo" },
+    { "id": "curl_biceps", "nombre": "Curl bíceps", "patron": "aislado", "grupo": "biceps", "categoria": "aislado", "equipo": ["mancuerna"], "rango_reps": "10-12", "intensidad": "RIR 1" },
+    { "id": "curl_martillo", "nombre": "Curl martillo", "patron": "aislado", "grupo": "biceps", "categoria": "aislado", "equipo": ["mancuerna"], "rango_reps": "12", "intensidad": "al fallo" },
+    { "id": "encogimientos", "nombre": "Encogimientos de hombros", "patron": "aislado", "grupo": "trapecio", "categoria": "aislado", "equipo": ["mancuerna", "mochila"], "rango_reps": "15-20", "nota": "rango corto: muchas reps o mochila; 8 reps es muy poco aquí" },
+
+    { "id": "hollow_hold", "nombre": "Hollow body hold", "patron": "core", "categoria": "core", "equipo": ["corporal"], "unidad": "segundos", "linea_progresion": "core_lsit" },
+    { "id": "hollow_rocks", "nombre": "Hollow rocks", "patron": "core", "categoria": "core", "equipo": ["corporal"], "rango_reps": "10-15", "linea_progresion": "core_lsit" },
+    { "id": "l_sit_tucked", "nombre": "L-sit tucked", "patron": "core", "categoria": "skill", "equipo": ["corporal", "barras"], "unidad": "segundos", "linea_progresion": "core_lsit" },
+    { "id": "arch_hold", "nombre": "Arch hold (Superman)", "patron": "core", "categoria": "core", "equipo": ["corporal"], "unidad": "segundos", "estado": "graduado" },
+    { "id": "dead_bug", "nombre": "Dead bug", "patron": "core", "categoria": "core", "equipo": ["corporal"], "rango_reps": "12", "nota": "bajo estímulo articular" },
+    { "id": "bird_dog", "nombre": "Bird dog", "patron": "core", "categoria": "core", "equipo": ["corporal"], "rango_reps": "12", "nota": "complemento antiextensión del hollow; pausa de 2s" },
+    { "id": "plancha", "nombre": "Plancha sobre antebrazos", "patron": "core", "categoria": "core", "equipo": ["corporal"], "unidad": "segundos" },
+    { "id": "plancha_lateral_elevacion", "nombre": "Plancha lateral con elevación de cadera", "patron": "core", "categoria": "core", "unilateral": true, "equipo": ["corporal"], "rango_reps": "8-10", "nota": "pausa arriba antes que más reps" },
+
+    { "id": "remo_z2", "nombre": "Remo Zona 2", "patron": "cardio", "categoria": "cardio", "equipo": ["remadora"], "unidad": "minutos", "zona": "Z2 conversacional" },
+    { "id": "remo_intervalos", "nombre": "Remo por intervalos", "patron": "cardio", "categoria": "cardio", "equipo": ["remadora"], "unidad": "minutos", "zona": "VO2", "protocolo": "1:20 fuerte / 1:20 suave", "nota": "cubre la casilla de VO2 sin impacto" },
+    { "id": "hiit_fitness_plus", "nombre": "HIIT Apple Fitness+", "patron": "cardio", "categoria": "cardio", "equipo": ["fitness_plus"], "unidad": "minutos", "zona": "VO2" },
+    { "id": "tenis", "nombre": "Tenis", "patron": "cardio", "categoria": "deporte", "unidad": "minutos" },
+    { "id": "caminata", "nombre": "Caminata", "patron": "cardio", "categoria": "cardio", "unidad": "minutos", "zona": "Z2" },
+
+    { "id": "yoga", "nombre": "Yoga Fitness+", "patron": "movilidad", "categoria": "movilidad", "equipo": ["fitness_plus"], "unidad": "minutos" },
+    { "id": "soleo_contract_relax", "nombre": "Sóleo contract-relax", "patron": "movilidad", "categoria": "movilidad", "unilateral": true, "unidad": "segundos", "nota": "el limitante principal del deep squat" },
+    { "id": "gemelo_rodilla_recta", "nombre": "Gemelo (rodilla recta)", "patron": "movilidad", "categoria": "movilidad", "unilateral": true, "unidad": "segundos" },
+    { "id": "knee_to_wall_cargado", "nombre": "Knee-to-wall con carga", "patron": "movilidad", "categoria": "movilidad", "unilateral": true, "equipo": ["mancuerna"], "rango_reps": "10 lento" },
+    { "id": "deep_squat_hold", "nombre": "Deep squat hold asistido", "patron": "movilidad", "categoria": "movilidad", "unidad": "segundos" },
+    { "id": "equilibrio_1p", "nombre": "Equilibrio sobre una pierna", "patron": "movilidad", "categoria": "propiocepcion", "unilateral": true, "unidad": "segundos" }
+  ],
+  "lineas_progresion": {
+    "push_vertical_hspu": ["pike_push_up", "pike_push_up_pies_elevados", "wall_handstand", "wall_hspu_negativo", "wall_hspu_completo", "hspu_libre"],
+    "push_horizontal_planche": ["push_up_deficit", "diamond_push_up", "pseudo_planche_lean", "archer_push_up", "tucked_planche", "advanced_tuck_planche"],
+    "pull_dominada": ["pull_up_asistido", "dead_hang_60s", "scapular_pulls", "pull_up_negativo", "pull_up_completo", "pull_up_arqueado"],
+    "pierna_pistol": ["sentadilla_bulgara", "step_up_alto", "pistol_cajon", "pistol_asistido", "pistol_completo", "pistol_con_peso"],
+    "core_lsit": ["hollow_hold", "hollow_rocks", "l_sit_tucked", "l_sit_semi_extendida", "l_sit_completo", "toes_to_bar"]
+  },
+  "regla_dominio": "3 series limpias del rep/tiempo objetivo durante 2 semanas seguidas antes de subir de nivel. Una skill activa por categoría."
+}

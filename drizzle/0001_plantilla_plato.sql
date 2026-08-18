@@ -1,0 +1,1 @@
+ALTER TABLE `profile` ADD `plantilla_plato` text;

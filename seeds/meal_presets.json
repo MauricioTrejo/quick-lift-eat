@@ -1,0 +1,89 @@
+{
+  "_meta": {
+    "fuente": "sistema_alimentacion_flexible_v1.html §03 y §05",
+    "proposito": "La fila de 'lo de siempre' en la pantalla de comida. Un tap registra la comida completa. Es el mayor ahorro de escritura del lado de nutrición.",
+    "nota": "Los cuatro snacks de las 16:30 vienen textualmente del §05. Los desayunos/comidas/cenas son composiciones que respetan la plantilla del plato; hay que reemplazarlos por los que el usuario de verdad repite en cuanto haya una semana de datos reales."
+  },
+  "presets": [
+    {
+      "id": "snack_yogurt_chia",
+      "nombre": "Yogurt griego + chía + frambuesas",
+      "slot": "snack",
+      "hora_sugerida": "16:30",
+      "items": [{ "id": "yogurt_griego", "cant": 1 }, { "id": "chia", "cant": 1 }, { "id": "frutos_rojos", "cant": 1 }],
+      "macros": { "proteina": 20.5, "fibra": 13, "kcal": 225 },
+      "origen": "§05"
+    },
+    {
+      "id": "snack_huevos_zanahoria",
+      "nombre": "Dos huevos cocidos + zanahoria",
+      "slot": "snack",
+      "hora_sugerida": "16:30",
+      "items": [{ "id": "huevo", "cant": 1 }, { "id": "zanahoria", "cant": 1 }],
+      "macros": { "proteina": 13, "fibra": 3.5, "kcal": 190 },
+      "origen": "§05"
+    },
+    {
+      "id": "snack_jicama_pepitas",
+      "nombre": "Jícama con limón + pepitas",
+      "slot": "snack",
+      "hora_sugerida": "16:30",
+      "items": [{ "id": "jicama", "cant": 1 }, { "id": "pepitas", "cant": 1 }],
+      "macros": { "proteina": 10, "fibra": 8, "kcal": 205 },
+      "origen": "§05"
+    },
+    {
+      "id": "snack_licuado_manzana",
+      "nombre": "Licuado de proteína + media manzana",
+      "slot": "snack",
+      "hora_sugerida": "16:30",
+      "items": [{ "id": "proteina_polvo", "cant": 1 }, { "id": "manzana", "cant": 0.5 }],
+      "macros": { "proteina": 24.3, "fibra": 3.3, "kcal": 168 },
+      "origen": "§05"
+    },
+    {
+      "id": "desayuno_huevos_completo",
+      "nombre": "Huevos, verdura, aguacate + chía",
+      "slot": "desayuno",
+      "items": [{ "id": "huevo", "cant": 2 }, { "id": "espinaca", "cant": 1 }, { "id": "aguacate", "cant": 1 }, { "id": "chia", "cant": 1 }],
+      "macros": { "proteina": 30, "fibra": 10.5, "kcal": 445 }
+    },
+    {
+      "id": "desayuno_yogurt_completo",
+      "nombre": "Yogurt griego, frutos rojos, pepitas + chía",
+      "slot": "desayuno",
+      "items": [{ "id": "yogurt_griego", "cant": 2 }, { "id": "frutos_rojos", "cant": 1 }, { "id": "pepitas", "cant": 1 }, { "id": "chia", "cant": 1 }],
+      "macros": { "proteina": 46.5, "fibra": 15, "kcal": 485 }
+    },
+    {
+      "id": "comida_guisado_estandar",
+      "nombre": "Guisado + verdura + arroz",
+      "slot": "comida",
+      "items": [{ "id": "pollo", "cant": 2 }, { "id": "calabacita", "cant": 1 }, { "id": "nopal", "cant": 1 }, { "id": "arroz", "cant": 1 }, { "id": "aguacate", "cant": 1 }],
+      "macros": { "proteina": 69, "fibra": 9.1, "kcal": 795 },
+      "nota": "el plato de riesgo — aplica el protocolo de 20 minutos"
+    },
+    {
+      "id": "comida_restaurante",
+      "nombre": "Restaurante (guarnición cambiada por verdura)",
+      "slot": "comida",
+      "items": [{ "id": "res_magra", "cant": 2 }, { "id": "ensalada_mixta", "cant": 2 }, { "id": "tortilla_maiz", "cant": 1 }, { "id": "aguacate", "cant": 1 }],
+      "macros": { "proteina": 57, "fibra": 9, "kcal": 675 },
+      "nota": "día flexible — reglas mínimas: proteína en cada comida, verdura en cada comida, sentado sin pantalla"
+    },
+    {
+      "id": "cena_estandar",
+      "nombre": "Proteína, verdura + postre planeado",
+      "slot": "cena",
+      "items": [{ "id": "pescado_blanco", "cant": 2 }, { "id": "ejote", "cant": 1 }, { "id": "ensalada_mixta", "cant": 1 }, { "id": "aceite_oliva", "cant": 1 }, { "id": "dulce_planeado", "cant": 1 }],
+      "macros": { "proteina": 49, "fibra": 5.5, "kcal": 605 }
+    }
+  ],
+  "protocolo_tarde": [
+    { "hora": "14:00", "evento": "Comida completa, 20 minutos", "tipo": "comida", "recordatorio": "cronómetro de 20 min; verdura o caldo primero 5 min; cubiertos abajo entre bocados; sin pantalla" },
+    { "hora": "15:00", "evento": "500 ml de agua", "tipo": "ancla", "recordatorio": "sin pensarlo, sin evaluar si tienes hambre" },
+    { "hora": "15:30-16:30", "evento": "Zona ámbar — regla de los 3 minutos", "tipo": "protocolo", "recordatorio": "300 ml de agua · 10 respiraciones 4s dentro / 6s fuera · 3 min fuera del escritorio. Si el hambre sigue, es hambre: adelanta el snack y come completo." },
+    { "hora": "16:30", "evento": "Snack agendado", "tipo": "comida", "recordatorio": "~200 kcal, 20 g proteína, 5 g fibra. Déjalo listo desde la mañana." },
+    { "hora": "20:00", "evento": "Cena y postre planeado", "tipo": "comida", "recordatorio": "la indulgencia programada evita el atracón reactivo" }
+  ]
+}

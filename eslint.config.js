@@ -36,5 +36,54 @@ export default tseslint.config(
       "@typescript-eslint/no-unused-vars": "off",
     },
   },
+
+  // ───────────────────────────────────────────────────────────────────────────
+  // Dos fronteras que no deben depender de que alguien se acuerde.
+  // ───────────────────────────────────────────────────────────────────────────
+  {
+    files: ["**/*.{ts,tsx}"],
+    ignores: ["src/lib/db/**", "src/lib/api/**", "src/lib/auth.ts", "scripts/**"],
+    rules: {
+      // 1. El código de cliente no importa la base. En producción esto ya es
+      //    imposible —el binding D1 solo existe dentro del Worker, el navegador
+      //    no tiene llave ni URL que usar— pero fallar aquí avisa al escribir el
+      //    import y no al depurar un bundle roto.
+      "no-restricted-imports": [
+        "error",
+        {
+          patterns: [
+            {
+              group: ["**/lib/db/*", "@/lib/db/*", "drizzle-orm/*"],
+              message:
+                "La base solo se toca desde el servidor. Llama a una server function de @/lib/api/ en vez de importar el cliente de base de datos.",
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // 2. Nada de SQL armado por concatenación. Drizzle parametriza todo lo que
+    //    construye, así que la inyección solo puede entrar por la puerta de atrás:
+    //    sql.raw() con un template literal interpolado. Se prohíbe esa forma.
+    //    Para SQL dinámico legítimo existe sql`` con placeholders, que sí parametriza.
+    files: ["src/lib/db/**/*.ts", "src/lib/api/**/*.ts", "scripts/**/*.mjs"],
+    rules: {
+      "no-restricted-syntax": [
+        "error",
+        {
+          selector:
+            "CallExpression[callee.property.name='raw'] > TemplateLiteral[expressions.length>0]",
+          message:
+            "sql.raw() con un template literal interpolado es una inyección de SQL esperando a pasar. Usa sql`...${valor}...`, que parametriza, o pasa el valor por .bind().",
+        },
+        {
+          selector: "CallExpression[callee.name='raw'] > TemplateLiteral[expressions.length>0]",
+          message:
+            "raw() con un template literal interpolado es una inyección de SQL esperando a pasar. Usa sql`...${valor}...`, que parametriza.",
+        },
+      ],
+    },
+  },
   eslintPluginPrettier,
 );

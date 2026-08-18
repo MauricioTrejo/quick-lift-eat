@@ -12,15 +12,7 @@ type Props = {
   children?: ReactNode;
 };
 
-export function Stepper({
-  value,
-  onChange,
-  step,
-  min = 0,
-  suffix,
-  size = "lg",
-  disabled,
-}: Props) {
+export function Stepper({ value, onChange, step, min = 0, suffix, size = "lg", disabled }: Props) {
   return (
     <div className="flex flex-1 items-center gap-0.5">
       <button

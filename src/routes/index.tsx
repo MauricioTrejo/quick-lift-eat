@@ -1,18 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
-import { Check, Flame, Scale } from "lucide-react";
-import { seed } from "@/data/types";
-import {
-  actions,
-  ejerciciosHoy,
-  fmtDuracion,
-  objetivos,
-  sesionHoy,
-  siguienteEvento,
-  totalesDelDia,
-  useHoraDecimal,
-  useStore,
-} from "@/lib/store";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { Check, Flame, Scale, Upload } from "lucide-react";
+import { obtenerHoy, obtenerRacha } from "@/lib/api/queries";
+import { guardarPeso, reabrirSesion } from "@/lib/api/mutations";
 import { MacroBar } from "@/components/MacroBar";
 import { cn } from "@/lib/utils";
 
@@ -23,7 +14,7 @@ export const Route = createFileRoute("/")({
       {
         name: "description",
         content:
-          "Registra tu entreno de fuerza y tus comidas en pocos taps, sin abrir el teclado. Prototipo mobile-first en español.",
+          "Registra tu entreno de fuerza y tus comidas en pocos taps, sin abrir el teclado. Mobile-first, en español.",
       },
       { property: "og:title", content: "Hoy · Fuerza y Plato" },
       {
@@ -35,31 +26,65 @@ export const Route = createFileRoute("/")({
   component: Hoy,
 });
 
+const DIAS = ["", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"];
+
+function fechaLarga(iso: string, diaSemana: number) {
+  const [, m, d] = iso.split("-").map(Number);
+  const meses = [
+    "enero",
+    "febrero",
+    "marzo",
+    "abril",
+    "mayo",
+    "junio",
+    "julio",
+    "agosto",
+    "septiembre",
+    "octubre",
+    "noviembre",
+    "diciembre",
+  ];
+  return `${DIAS[diaSemana]} ${d} de ${meses[(m ?? 1) - 1]}`;
+}
+
 function Hoy() {
-  const hora = useHoraDecimal();
-  const mealLogs = useStore((s) => s.mealLogs);
-  const peso = useStore((s) => s.peso);
-  const cierre = useStore((s) => s.sesiones[sesionHoy.id]);
-  const setLogs = useStore((s) => s.setLogs);
+  const qc = useQueryClient();
+  const { data, isPending, error } = useQuery({ queryKey: ["hoy"], queryFn: () => obtenerHoy() });
+  const { data: racha } = useQuery({ queryKey: ["racha"], queryFn: () => obtenerRacha() });
   const [abrirBascula, setAbrirBascula] = useState(false);
-  const [pesoTmp, setPesoTmp] = useState(Math.round((peso ?? seed.demo.perfil_demo.peso_kg) * 10));
+  const [pesoTmp, setPesoTmp] = useState<number | null>(null);
 
-  const total = totalesDelDia(mealLogs);
-  const hayEntreno = true;
-  const objCal = hayEntreno ? objetivos.calorias_entreno : objetivos.calorias_descanso;
-  const evento = siguienteEvento(hora);
+  const invalidar = () => {
+    void qc.invalidateQueries({ queryKey: ["hoy"] });
+    void qc.invalidateQueries({ queryKey: ["racha"] });
+  };
 
-  const seriesHechas = Object.keys(setLogs).length;
-  const seriesTotales = ejerciciosHoy.reduce((a, e) => a + e.series, 0);
+  const mPeso = useMutation({
+    mutationFn: (peso: number) => guardarPeso({ data: { peso } }),
+    onSuccess: invalidar,
+  });
+  const mReabrir = useMutation({ mutationFn: () => reabrirSesion(), onSuccess: invalidar });
+
+  if (isPending) return <Cargando />;
+  if (error) return <Fallo mensaje={String(error)} />;
+  if (!data) return null;
+
+  // Sin plan cargado no hay nada que mostrar, y disimularlo con una pantalla
+  // vacía sería peor: se dice qué falta y cómo resolverlo.
+  if (!data.tienePlan) return <SinPlan />;
+
+  const { totales, objetivos } = data;
+  const decimas = pesoTmp ?? Math.round((data.peso ?? 80) * 10);
 
   const noNegociables = [
-    { etiqueta: "Proteína 140g", ok: total.proteina_g >= objetivos.proteina_g },
-    { etiqueta: "Fibra 30g", ok: total.fibra_g >= objetivos.fibra_g },
+    { etiqueta: "Proteína", ok: totales.proteinaG >= objetivos.proteinaG },
+    { etiqueta: "Fibra", ok: totales.fibraG >= objetivos.fibraG },
+    { etiqueta: "Snack 16:30", ok: data.noNegociables.snack },
     {
-      etiqueta: "Snack 16:30",
-      ok: mealLogs.some((m) => m.slot === "snack" && m.fecha === "2026-07-31"),
+      etiqueta: "Báscula",
+      ok: data.noNegociables.bascula,
+      accion: () => setAbrirBascula((v) => !v),
     },
-    { etiqueta: "Báscula", ok: peso !== null, accion: () => setAbrirBascula((v) => !v) },
   ];
 
   return (
@@ -67,32 +92,40 @@ function Hoy() {
       <header className="flex items-start justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-            Viernes 31 de julio
+            {fechaLarga(data.fecha, data.diaSemana)}
           </p>
           <h1 className="mt-1 text-2xl font-semibold tracking-tight">Hoy</h1>
         </div>
         <div className="flex items-center gap-1.5 rounded-full bg-elevated px-3 py-1.5">
           <Flame className="h-4 w-4 text-terracota" />
-          <span className="num text-sm font-semibold">{seed.demo.perfil_demo.racha_dias}</span>
+          <span className="num text-sm font-semibold">{racha ?? 0}</span>
           <span className="text-xs text-muted-foreground">días</span>
         </div>
       </header>
 
       {/* Sesión */}
       <section className="mt-5 rounded-2xl bg-card p-4">
-        {cierre ? (
+        {!data.sesion ? (
+          <div>
+            <p className="text-xs uppercase tracking-widest text-muted-foreground">
+              {DIAS[data.diaSemana]}
+            </p>
+            <h2 className="mt-1 text-xl font-semibold">Día de descanso</h2>
+            <p className="mt-1 text-sm text-muted-foreground">Tu plan no tiene sesión para hoy.</p>
+          </div>
+        ) : data.sesionReal?.estado === "completada" ? (
           <div>
             <div className="flex items-center gap-2">
               <span className="flex h-7 w-7 items-center justify-center rounded-full bg-verde-soft">
                 <Check className="h-4 w-4 text-verde" />
               </span>
-              <h2 className="text-lg font-semibold">{sesionHoy.nombre}</h2>
+              <h2 className="text-lg font-semibold">{data.sesion.nombre}</h2>
             </div>
             <p className="num mt-3 text-sm text-muted-foreground">
-              {seriesHechas} series · {fmtDuracion(cierre.duracion_s)} · RPE {cierre.rpe ?? "—"}
+              {data.sesionReal.seriesHechas} series · RPE {data.sesionReal.rpe ?? "—"}
             </p>
             <button
-              onClick={() => actions.reabrirSesion(sesionHoy.id)}
+              onClick={() => mReabrir.mutate()}
               className="mt-3 text-xs text-muted-foreground underline"
             >
               Reabrir sesión
@@ -101,18 +134,18 @@ function Hoy() {
         ) : (
           <>
             <p className="text-xs uppercase tracking-widest text-muted-foreground">
-              {sesionHoy.dia}
+              {DIAS[data.diaSemana]}
             </p>
-            <h2 className="mt-1 text-xl font-semibold">{sesionHoy.nombre}</h2>
+            <h2 className="mt-1 text-xl font-semibold">{data.sesion.nombre}</h2>
             <p className="num mt-1 text-sm text-muted-foreground">
-              {ejerciciosHoy.length} ejercicios · {seriesTotales} series · ~{sesionHoy.duracion_min}{" "}
-              min
+              {data.sesion.ejercicios} ejercicios · {data.sesion.series} series
+              {data.sesion.duracionMin ? ` · ~${data.sesion.duracionMin} min` : ""}
             </p>
             <Link
               to="/entreno"
               className="tap mt-4 flex w-full items-center justify-center rounded-xl bg-primary text-base font-semibold text-primary-foreground active:opacity-90"
             >
-              {seriesHechas > 0 ? "Continuar" : "Empezar"}
+              {(data.sesionReal?.seriesHechas ?? 0) > 0 ? "Continuar" : "Empezar"}
             </Link>
           </>
         )}
@@ -122,25 +155,25 @@ function Hoy() {
       <section className="mt-4 space-y-5 rounded-2xl bg-card p-4">
         <MacroBar
           etiqueta="Proteína"
-          consumido={total.proteina_g}
-          objetivo={objetivos.proteina_g}
+          consumido={totales.proteinaG}
+          objetivo={objetivos.proteinaG}
           unidad="g"
           tono="verde"
         />
         <MacroBar
           etiqueta="Fibra"
-          consumido={total.fibra_g}
-          objetivo={objetivos.fibra_g}
+          consumido={totales.fibraG}
+          objetivo={objetivos.fibraG}
           unidad="g"
           tono="ambar"
         />
         <MacroBar
           etiqueta="Calorías"
-          consumido={total.calorias}
-          objetivo={objCal}
+          consumido={totales.calorias}
+          objetivo={objetivos.calorias}
           unidad="kcal"
           tono="terracota"
-          nota={hayEntreno ? "meta de entreno" : "meta de descanso"}
+          nota={objetivos.esDiaEntreno ? "meta de entreno" : "meta de descanso"}
         />
         <Link
           to="/comida"
@@ -173,30 +206,31 @@ function Hoy() {
             <p className="text-xs uppercase tracking-widest text-muted-foreground">Peso de hoy</p>
             <div className="mt-2 flex items-center justify-between">
               <button
-                onClick={() => setPesoTmp((v) => v - 2)}
+                onClick={() => setPesoTmp(decimas - 2)}
                 aria-label="Menos 0.2 kg"
-                className="tap flex items-center justify-center rounded-xl bg-elevated text-2xl"
+                className="tap flex items-center justify-center rounded-xl bg-elevated px-5 text-2xl"
               >
                 −
               </button>
               <span className="num text-4xl font-semibold">
-                {(pesoTmp / 10).toFixed(1)}
+                {(decimas / 10).toFixed(1)}
                 <span className="ml-1 text-base text-muted-foreground">kg</span>
               </span>
               <button
-                onClick={() => setPesoTmp((v) => v + 2)}
+                onClick={() => setPesoTmp(decimas + 2)}
                 aria-label="Más 0.2 kg"
-                className="tap flex items-center justify-center rounded-xl bg-elevated text-2xl"
+                className="tap flex items-center justify-center rounded-xl bg-elevated px-5 text-2xl"
               >
                 +
               </button>
             </div>
             <button
               onClick={() => {
-                actions.setPeso(pesoTmp / 10);
+                mPeso.mutate(decimas / 10);
                 setAbrirBascula(false);
               }}
-              className="tap mt-3 w-full rounded-xl bg-primary font-semibold text-primary-foreground"
+              disabled={mPeso.isPending}
+              className="tap mt-3 w-full rounded-xl bg-primary font-semibold text-primary-foreground disabled:opacity-60"
             >
               Guardar peso
             </button>
@@ -205,9 +239,52 @@ function Hoy() {
       </section>
 
       {/* Agenda */}
-      <p className="num mt-5 text-center text-xs text-muted-foreground">
-        {evento?.hora} · {evento?.evento}
+      {data.agenda.length > 0 && (
+        <p className="num mt-5 text-center text-xs text-muted-foreground">
+          {data.agenda[0]?.hora} · {data.agenda[0]?.evento}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function Cargando() {
+  return (
+    <div className="mx-auto max-w-md px-4 pt-6">
+      <div className="h-6 w-32 animate-pulse rounded bg-elevated" />
+      <div className="mt-5 h-40 animate-pulse rounded-2xl bg-card" />
+      <div className="mt-4 h-56 animate-pulse rounded-2xl bg-card" />
+    </div>
+  );
+}
+
+function Fallo({ mensaje }: { mensaje: string }) {
+  return (
+    <div className="mx-auto max-w-md px-4 pt-16">
+      <div className="rounded-2xl bg-terracota-soft p-5">
+        <p className="text-sm font-semibold text-terracota">No se pudo cargar tu día</p>
+        <p className="mt-2 break-words text-xs text-muted-foreground">{mensaje}</p>
+      </div>
+    </div>
+  );
+}
+
+function SinPlan() {
+  return (
+    <div className="mx-auto flex min-h-[70vh] max-w-md flex-col items-center justify-center px-8 pb-28 text-center">
+      <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-elevated">
+        <Upload className="h-6 w-6 text-muted-foreground" />
+      </span>
+      <h1 className="mt-4 text-lg font-semibold">Todavía no tienes un plan</h1>
+      <p className="mt-2 text-sm text-muted-foreground">
+        Carga el tuyo o empieza con el de ejemplo para ver cómo funciona.
       </p>
+      <Link
+        to="/plan"
+        className="tap mt-6 flex w-full items-center justify-center rounded-xl bg-primary text-base font-semibold text-primary-foreground"
+      >
+        Cargar un plan
+      </Link>
     </div>
   );
 }

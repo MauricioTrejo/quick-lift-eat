@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { LineChart } from "lucide-react";
 
 export const Route = createFileRoute("/progreso")({
@@ -24,6 +24,15 @@ function Progreso() {
       </span>
       <h1 className="mt-4 text-lg font-semibold">Progreso</h1>
       <p className="mt-2 text-sm text-muted-foreground">Disponible cuando haya datos reales.</p>
+
+      {/* La barra inferior se queda en cuatro, como manda el spec, así que la
+          gestión del plan cuelga de aquí en vez de robar un quinto espacio. */}
+      <Link
+        to="/plan"
+        className="tap mt-8 flex w-full items-center justify-center rounded-xl bg-elevated text-sm font-semibold"
+      >
+        Cargar o cambiar plan
+      </Link>
     </div>
   );
 }

@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ComidaRouteImport } from './routes/comida'
 import { Route as EntrenoRouteImport } from './routes/entreno'
+import { Route as PlanRouteImport } from './routes/plan'
 import { Route as ProgresoRouteImport } from './routes/progreso'
 
 const IndexRoute = IndexRouteImport.update({
@@ -29,6 +30,11 @@ const EntrenoRoute = EntrenoRouteImport.update({
   path: '/entreno',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlanRoute = PlanRouteImport.update({
+  id: '/plan',
+  path: '/plan',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProgresoRoute = ProgresoRouteImport.update({
   id: '/progreso',
   path: '/progreso',
@@ -39,12 +45,14 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/comida': typeof ComidaRoute
   '/entreno': typeof EntrenoRoute
+  '/plan': typeof PlanRoute
   '/progreso': typeof ProgresoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/comida': typeof ComidaRoute
   '/entreno': typeof EntrenoRoute
+  '/plan': typeof PlanRoute
   '/progreso': typeof ProgresoRoute
 }
 export interface FileRoutesById {
@@ -52,20 +60,22 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/comida': typeof ComidaRoute
   '/entreno': typeof EntrenoRoute
+  '/plan': typeof PlanRoute
   '/progreso': typeof ProgresoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/comida' | '/entreno' | '/progreso'
+  fullPaths: '/' | '/comida' | '/entreno' | '/plan' | '/progreso'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/comida' | '/entreno' | '/progreso'
-  id: '__root__' | '/' | '/comida' | '/entreno' | '/progreso'
+  to: '/' | '/comida' | '/entreno' | '/plan' | '/progreso'
+  id: '__root__' | '/' | '/comida' | '/entreno' | '/plan' | '/progreso'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ComidaRoute: typeof ComidaRoute
   EntrenoRoute: typeof EntrenoRoute
+  PlanRoute: typeof PlanRoute
   ProgresoRoute: typeof ProgresoRoute
 }
 
@@ -92,6 +102,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EntrenoRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/plan': {
+      id: '/plan'
+      path: '/plan'
+      fullPath: '/plan'
+      preLoaderRoute: typeof PlanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/progreso': {
       id: '/progreso'
       path: '/progreso'
@@ -106,8 +123,19 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ComidaRoute: ComidaRoute,
   EntrenoRoute: EntrenoRoute,
+  PlanRoute: PlanRoute,
   ProgresoRoute: ProgresoRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
