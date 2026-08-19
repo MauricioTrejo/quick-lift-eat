@@ -48,18 +48,18 @@ Añade tu llave a `.dev.vars` y reinicia:
 ANTHROPIC_API_KEY=sk-ant-...
 ```
 
-Entonces **Crear plan → Con un agente** genera un programa desde tus metas, y el botón *Ajustar mi plan* aparece al cerrar una sesión. Sin llave, ambos caminos fallan con un mensaje que lo explica; el resto de la app sigue funcionando.
+Entonces **Crear plan → Con un agente** genera un programa desde tus metas, y el botón _Ajustar mi plan_ aparece al cerrar una sesión. Sin llave, ambos caminos fallan con un mensaje que lo explica; el resto de la app sigue funcionando.
 
 ### Comandos
 
-| Comando | Qué hace |
-|---|---|
-| `npm run dev` | Vite en Node, con `.dev.vars` cargado. El día a día. |
+| Comando                  | Qué hace                                                                |
+| ------------------------ | ----------------------------------------------------------------------- |
+| `npm run dev`            | Vite en Node, con `.dev.vars` cargado. El día a día.                    |
 | `npm run preview:worker` | La app dentro de workerd, como en producción. Úsalo antes de desplegar. |
-| `npm run db:migrate` | Aplica migraciones a la base local |
-| `npm run db:seed` | Siembra el catálogo (idempotente) |
-| `npm run db:reset` | Borra la base local y la reconstruye vacía |
-| `npm run build` | Compila para Cloudflare Workers |
+| `npm run db:migrate`     | Aplica migraciones a la base local                                      |
+| `npm run db:seed`        | Siembra el catálogo (idempotente)                                       |
+| `npm run db:reset`       | Borra la base local y la reconstruye vacía                              |
+| `npm run build`          | Compila para Cloudflare Workers                                         |
 
 **Dos motores, un solo dialecto.** En producción la base es D1; en `npm run dev` es el mismo archivo SQLite que crea wrangler, leído con el `node:sqlite` integrado de Node. Mismo esquema, mismas queries, cero módulos nativos.
 
@@ -67,16 +67,20 @@ Entonces **Crear plan → Con un agente** genera un programa desde tus metas, y 
 
 ## Desplegar
 
+Guía completa paso a paso, con cómo verificar cada paso y qué hacer cuando algo falla: **[`docs/despliegue.md`](docs/despliegue.md)**. Unos 30 minutos y $0 — todo cabe en el free tier.
+
+El resumen:
+
 ```bash
-npm run db:create                      # devuelve un database_id
-# pega ese id en wrangler.jsonc
+npm run db:create                      # devuelve un database_id → pégalo en wrangler.jsonc
 npm run db:migrate:remote
 npm run db:seed -- --remote
+npm run build
+npx wrangler deploy -c .output/server/wrangler.json
 npx wrangler secret put ANTHROPIC_API_KEY   # solo si usas los agentes
-npm run build && npx wrangler deploy -c .output/server/wrangler.json
 ```
 
-Después, pon **Cloudflare Access** delante del Worker con tu correo. Sin Access la app se niega a abrirse: el modo por defecto es cerrado y abrirlo exige `AUTH_MODO=abierto` en `.dev.vars`, que wrangler nunca despliega.
+Después, **Cloudflare Access** delante del Worker con tu correo. No es opcional: sin identidad la app se niega a abrirse (falla cerrada), y sin Access la URL sería pública.
 
 ---
 
@@ -95,7 +99,7 @@ Cloudflare Access ──▶ Worker (PWA + server functions) ──▶ D1
 - **El plan** — lo que deberías hacer. **Versionado**: cuando el agente ajusta, abre una versión nueva y archiva la anterior con su fecha. El histórico sigue comparable.
 - **La realidad** — lo que hiciste. Nunca se reescribe.
 
-Esa separación es lo que permite preguntar *"¿esto lo hice o solo lo tenía planeado?"*, y es lo que hace que esto sea un producto en vez del plan de una persona.
+Esa separación es lo que permite preguntar _"¿esto lo hice o solo lo tenía planeado?"_, y es lo que hace que esto sea un producto en vez del plan de una persona.
 
 ### Lo que un modelo NO hace
 
@@ -107,7 +111,7 @@ El modelo recibe esas conclusiones ya calculadas y decide lo que un `if/else` no
 
 ### Auditoría de cambios
 
-Cada ajuste del agente deja una fila en `plan_change` por campo modificado, con su motivo y la llamada que lo produjo. *"¿Por qué subió mi objetivo de sentadilla?"* tiene respuesta.
+Cada ajuste del agente deja una fila en `plan_change` por campo modificado, con su motivo y la llamada que lo produjo. _"¿Por qué subió mi objetivo de sentadilla?"_ tiene respuesta.
 
 ---
 

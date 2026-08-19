@@ -45,9 +45,19 @@ export class NoAutenticado extends Error {
 export function correoDeLaPeticion(): string | null {
   const env = envCloudflare();
 
-  // Cloudflare Access pone esta cabecera después de validar la identidad.
-  const deAccess = getRequestHeader("cf-access-authenticated-user-email");
-  if (deAccess) return deAccess;
+  /* Access inyecta DOS cosas al pasar una petición al origen, y no son
+     equivalentes: `Cf-Access-Jwt-Assertion` es la documentada y garantizada;
+     `Cf-Access-Authenticated-User-Email` es cómoda pero no aparece en la
+     referencia de Access. Leer solo la segunda arriesgaba quedarse fuera de la
+     app desplegada sin más síntoma que "Sin identidad". Se prueban las dos. */
+  const deCabecera = getRequestHeader("cf-access-authenticated-user-email");
+  if (deCabecera) return deCabecera;
+
+  const jwt = getRequestHeader("cf-access-jwt-assertion");
+  if (jwt) {
+    const email = correoDelJwt(jwt);
+    if (email) return email;
+  }
 
   // Sin Access enfrente: solo se permite el correo declarado explícitamente en
   // la configuración. Nunca un valor que venga de la petición.
@@ -59,6 +69,34 @@ export function correoDeLaPeticion(): string | null {
   if (!env) return process.env["DEV_USER_EMAIL"] ?? "dev@localhost";
 
   return null;
+}
+
+/**
+ * Extrae el correo del JWT que inyecta Access.
+ *
+ * LIMITACIÓN CONOCIDA, y conviene que sea explícita: esto DECODIFICA el token,
+ * no verifica su firma. Verificarla en condiciones implica traer las llaves
+ * públicas de `https://<tu-equipo>.cloudflareaccess.com/cdn-cgi/access/certs` y
+ * comprobar RS256 en cada petición.
+ *
+ * Es aceptable aquí porque Access es la ÚNICA ruta hacia el Worker: nadie puede
+ * llegar al origen sin pasar por él, así que no hay por dónde inyectar un token
+ * falso. Deja de ser aceptable el día que expongas el Worker por otra ruta —un
+ * dominio propio sin política, otro route— porque entonces cualquiera podría
+ * mandar la cabecera a mano. Si haces eso, verifica la firma primero.
+ */
+function correoDelJwt(jwt: string): string | null {
+  try {
+    const payload = jwt.split(".")[1];
+    if (!payload) return null;
+    // base64url → base64, con el relleno que atob exige.
+    const b64 = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const json = atob(b64.padEnd(b64.length + ((4 - (b64.length % 4)) % 4), "="));
+    const datos = JSON.parse(json) as { email?: string };
+    return datos.email ?? null;
+  } catch {
+    return null;
+  }
 }
 
 /**
